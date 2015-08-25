@@ -41,9 +41,10 @@
 		<script src="three/RenderPass.js"></script>
 		<script src="three/ShaderPass.js"></script>
         <script src="three/MaskPass.js"></script> 
-        <script src="three/BokehPass.js"></script> 
+        <!--<script src="three/BokehPass.js"></script> -->
         <script src="three/trackball.js"></script>
         <script src="three/threex.videotexture.js"></script>
+        <script src="three/objLoader.js"></script>
         
         <!--SHADERS-->
         <script src="shaders/FresnelShader.js"></script>
@@ -66,6 +67,8 @@
 			var kaleidoParams, kaleidoPass;
             var liquidParams, liquidPass;
             var materialGradientParams ;
+            var bokehPass, bokeh_params;
+            var postprocessing = {};
 			var composer;
 			var cubeHolder;
             var updateFcts	= [];
@@ -119,6 +122,29 @@
                 updateFcts.push(function(delta, now){
                     videoTexture.update(delta, now)
                 })
+                
+                //Bokeh
+                bokeh_params = {
+                    shaderFocus	: false,
+                    fstop 		: 2.6 * 3,
+                    maxblur 	: 2.0,
+                    showFocus 	: false,
+                    focalDepth 	: 4.2,
+                    manualdof 	: false,
+                    vignetting 	: false,
+                    depthblur 	: false,
+
+                    threshold 	: 0.5,
+                    gain 		: 0.1,
+                    bias 		: 0.5,
+                    fringe		: 0.7,
+
+                    focalLength	: 35,
+                    noise		: false,
+                    pentagon	: false,
+
+                    dithering	: 0.00001
+                };
                 
                 //Gradient Shader
                 materialGradientParams = { 
@@ -184,7 +210,26 @@
                 cubeHolder = new THREE.Object3D();
                 scene.add(cubeHolder);
                 composeGeometry(cubeHolder, material, 700, {nested : true, dims : [50,300,50], spread : 2000, randRot: true});
+                
+                //Load Crystal
+                var manager = new THREE.LoadingManager();
+                var loader = new THREE.OBJLoader( manager );
+				loader.load( 'assets/crystal/Crystal.obj', function ( object ) {
 
+					object.traverse( function ( child ) {
+
+						if ( child instanceof THREE.Mesh ) {
+
+							child.material = material;
+
+						}
+
+					} );
+                    var s = 100;
+                    object.scale.set(s,s,s)
+                    scene.add( object );
+                });
+                
 				//init renderer
 				renderer = new THREE.WebGLRenderer({
                     alpha: true,
@@ -203,15 +248,10 @@
 				//POST PROCESSING
 				//Create Shader Passes
 				//render pass renders scene into effects composer
-                var bokehPass = new THREE.BokehPass( scene, camera, {
-					focus: 		1.0,
-					aperture:	0.025,
-					maxblur:	100.0,
-					width: window.innerWidth,
-					height: innerHeight
-				} );
+                
 				var renderPass = new THREE.RenderPass( scene, camera );
                 var bgrenderPass = new THREE.RenderPass( bgScene, bgCam );
+                bokehPass = new THREE.ShaderPass( THREE.BokehShader )
                 liquidPass = new THREE.ShaderPass( THREE.LiquidShader );
 				rgbPass = new THREE.ShaderPass( THREE.RGBShiftShader );
 				kaleidoPass = new THREE.ShaderPass( THREE.KaleidoShader );
@@ -229,7 +269,6 @@
                 composer.addPass( liquidPass );
                 //composer.addPass( circleGradientPass );
                 composer.addPass( kaleidoPass );
-                composer.addPass( bokehPass );
 				composer.addPass( rgbPass );
                 //bgcomposer.addPass( rgbPass );
                 
@@ -277,6 +316,7 @@
             
 			function onParamsChange() {
 				//copy gui params into shader uniforms
+                //bokehPass.uniforms
                 liquidPass.uniforms[ "mxy" ].value = liquidParams.mxy;
                 liquidPass.uniforms[ "size" ].value = liquidParams.size;
                 circleGradientPass.uniforms[ "mxy" ].value = gradientParams.mxy;
@@ -298,7 +338,7 @@
             window.addEventListener('mousedown', function(event) { 
                 if (now/1000 > 28 && now/1000 < 48) { 
                     if (clicks < 10) clicks++;
-                    console.log(clicks)
+                    //console.log(clicks)
                 }
             }, true);
            
@@ -311,6 +351,10 @@
                 nowMsec = nowMsec%60000
                 now = nowMsec;
                 requestAnimationFrame( animate );
+                
+                //Move Camera to mouse
+                camera.position.x += ( mouseX - camera.position.x ) * .05;
+				camera.position.z += ( - mouseY - camera.position.z ) * .05;
                 
                 //Circle Gradient
                 if (nowMsec/1000 < 28) { //28
@@ -424,7 +468,6 @@
                     size: 0.01,
                     time: 0
 				}
-                
                 
                 onParamsChange();
                 

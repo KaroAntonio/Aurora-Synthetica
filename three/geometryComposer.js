@@ -43,7 +43,6 @@ function composeGeometry(parent, material, num, optArgs) {
 					//randomize size, posn + rotation
 					//cube.scale.x = cube.scale.y = cube.scale.z = Math.random() * 3 + .05;
                     if (optArgs['nested']) {
-                        console.log("nested")
                         var s = (i + 1.0) * 1.0 / num;
                         cube.scale.set(s,s,s)
                     }
