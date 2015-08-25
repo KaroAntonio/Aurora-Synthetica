@@ -123,29 +123,6 @@
                     videoTexture.update(delta, now)
                 })
                 
-                //Bokeh
-                bokeh_params = {
-                    shaderFocus	: false,
-                    fstop 		: 2.6 * 3,
-                    maxblur 	: 2.0,
-                    showFocus 	: false,
-                    focalDepth 	: 4.2,
-                    manualdof 	: false,
-                    vignetting 	: false,
-                    depthblur 	: false,
-
-                    threshold 	: 0.5,
-                    gain 		: 0.1,
-                    bias 		: 0.5,
-                    fringe		: 0.7,
-
-                    focalLength	: 35,
-                    noise		: false,
-                    pentagon	: false,
-
-                    dithering	: 0.00001
-                };
-                
                 //Gradient Shader
                 materialGradientParams = { 
                     tDiffuse: { type: "t", value: null },
@@ -251,7 +228,6 @@
                 
 				var renderPass = new THREE.RenderPass( scene, camera );
                 var bgrenderPass = new THREE.RenderPass( bgScene, bgCam );
-                bokehPass = new THREE.ShaderPass( THREE.BokehShader )
                 liquidPass = new THREE.ShaderPass( THREE.LiquidShader );
 				rgbPass = new THREE.ShaderPass( THREE.RGBShiftShader );
 				kaleidoPass = new THREE.ShaderPass( THREE.KaleidoShader );

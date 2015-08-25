@@ -19,7 +19,7 @@ function composeGeometry(parent, material, num, optArgs) {
                 var dims = optArgs["dims"];
                 switch(optArgs["type"]) {
                     case "CUBE":
-                        geometry = new THREE.CubeGeometry(dims[0], dims[1], dims[2]);
+                        geometry = new THREE.BoxGeometry(dims[0], dims[1], dims[2]);
                         break;
                     case "SPHERE":
                         geometry = new THREE.SphereGeometry( dims[0], dims[1], dims[2] );
