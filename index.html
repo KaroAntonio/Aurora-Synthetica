@@ -54,7 +54,7 @@
         <script src="shaders/CircleGradientShader.js"></script>
         <script src="shaders/GradientMaterialShader.js"></script>
 		<script src="shaders/RGBShiftShader.js"></script>
-        <script src="shaders/BokehShader.js"></script>
+        <!--<script src="shaders/BokehShader.js"></script>-->
         
         <script>
 
@@ -292,7 +292,6 @@
             
 			function onParamsChange() {
 				//copy gui params into shader uniforms
-                //bokehPass.uniforms
                 liquidPass.uniforms[ "mxy" ].value = liquidParams.mxy;
                 liquidPass.uniforms[ "size" ].value = liquidParams.size;
                 circleGradientPass.uniforms[ "mxy" ].value = gradientParams.mxy;
@@ -354,7 +353,7 @@
                 }
                 
                 //Kscope
-                if (nowMsec/1000 > 28 && nowMsec/1000 < 48) { 
+                if (nowMsec/1000 > 0 && nowMsec/1000 < 48) { 
                     kaleidoParams = {
 					sides: 10 - clicks,
 					//angle: nowMsec/-9000,
